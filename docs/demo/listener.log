@@ -1,0 +1,8 @@
+2026-09-01 09:49:53,854 INFO listener ready — Ctrl-C to stop
+2026-09-01 09:49:53,854 INFO TCP listening on 127.0.0.1:4245
+2026-09-01 09:49:54,046 INFO CoT from tcp 127.0.0.1:58555 | type=a-h-G-E-V-A-T lat=48.567123 lon=39.87897 callsign=tank-cee3
+2026-09-01 09:49:54,047 INFO CoT from tcp 127.0.0.1:58556 | type=a-h-G-E-V-A-A lat=48.6 lon=39.9 callsign=enemy-3440
+2026-09-01 09:49:54,047 INFO CoT from tcp 127.0.0.1:58557 | type=a-h-G-U-C-I lat=48.55 lon=39.8 callsign=infantry-2a3e
+2026-09-01 09:49:54,314 INFO map updated → docs/demo/cot_map.html (1 marker(s))
+2026-09-01 09:49:54,320 INFO map updated → docs/demo/cot_map.html (2 marker(s))
+2026-09-01 09:49:54,325 INFO map updated → docs/demo/cot_map.html (3 marker(s))

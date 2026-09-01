@@ -1,0 +1,20 @@
+# assignment inputs — not part of the deliverable repo
+task.md
+task2_CLAUDE_CODE_BRIEF.md
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# local artifacts
+.env
+cot_map.html
+*.log
+
+# ...but keep the committed demo artifacts
+!docs/demo/cot_map.html
+!docs/demo/listener.log

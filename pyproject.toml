@@ -1,0 +1,42 @@
+[project]
+name = "signal-atak"
+version = "0.1.0"
+description = "Signal bot that turns chat messages with coordinates into Cursor-on-Target events for ATAK/iTAK/WinTAK"
+requires-python = ">=3.11"
+dependencies = [
+    "attrs>=23.2",
+    "cattrs>=23.2",
+    "defusedxml>=0.7",
+    "folium>=0.16",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.4",
+    "black>=24.0",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests", "tools"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "SIM"]
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]

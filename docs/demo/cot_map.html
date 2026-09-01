@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_7dcc6e7e5eeced2dd9052ff59bd5ee9b {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_7dcc6e7e5eeced2dd9052ff59bd5ee9b" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_7dcc6e7e5eeced2dd9052ff59bd5ee9b = L.map(
+                "map_7dcc6e7e5eeced2dd9052ff59bd5ee9b",
+                {
+                    center: [48.55, 39.8],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 10,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_512092e868eab8ce4878efa020b13b83 = L.tileLayer(
+                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {
+  "minZoom": 0,
+  "maxZoom": 19,
+  "maxNativeZoom": 19,
+  "noWrap": false,
+  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_512092e868eab8ce4878efa020b13b83.addTo(map_7dcc6e7e5eeced2dd9052ff59bd5ee9b);
+        
+    
+            var marker_6f831d724a661bbb6e7c2b448209f8ad = L.marker(
+                [48.567123, 39.87897],
+                {
+}
+            ).addTo(map_7dcc6e7e5eeced2dd9052ff59bd5ee9b);
+        
+    
+        var popup_ae40f1f5ed10c15334dff6ec2d26ffb8 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_e456608eed69b144b43cda0c238adb95 = $(`<div id="html_e456608eed69b144b43cda0c238adb95" style="width: 100.0%; height: 100.0%;">tank-cee3<br>a-h-G-E-V-A-T<br>48.567123 39.87897 tank</div>`)[0];
+                popup_ae40f1f5ed10c15334dff6ec2d26ffb8.setContent(html_e456608eed69b144b43cda0c238adb95);
+            
+        
+
+        marker_6f831d724a661bbb6e7c2b448209f8ad.bindPopup(popup_ae40f1f5ed10c15334dff6ec2d26ffb8)
+        ;
+
+        
+    
+    
+            marker_6f831d724a661bbb6e7c2b448209f8ad.bindTooltip(
+                `<div>
+                     tank-cee3
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_1ae8716d9a09f7da0cdc24eec188677c = L.marker(
+                [48.6, 39.9],
+                {
+}
+            ).addTo(map_7dcc6e7e5eeced2dd9052ff59bd5ee9b);
+        
+    
+        var popup_1de512438afcd499622e8bf5a52df8fa = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_01778f23547e7a95e01a22d36ab4c5f2 = $(`<div id="html_01778f23547e7a95e01a22d36ab4c5f2" style="width: 100.0%; height: 100.0%;">enemy-3440<br>a-h-G-E-V-A-A<br>48.6 39.9 enemy APC near bridge</div>`)[0];
+                popup_1de512438afcd499622e8bf5a52df8fa.setContent(html_01778f23547e7a95e01a22d36ab4c5f2);
+            
+        
+
+        marker_1ae8716d9a09f7da0cdc24eec188677c.bindPopup(popup_1de512438afcd499622e8bf5a52df8fa)
+        ;
+
+        
+    
+    
+            marker_1ae8716d9a09f7da0cdc24eec188677c.bindTooltip(
+                `<div>
+                     enemy-3440
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var marker_780f81c04a90a6cd129de75c360f2d5c = L.marker(
+                [48.55, 39.8],
+                {
+}
+            ).addTo(map_7dcc6e7e5eeced2dd9052ff59bd5ee9b);
+        
+    
+        var popup_0ac322fe9d7a5e56055f1bb1a9c77c90 = L.popup({
+  "maxWidth": "100%",
+});
+
+        
+            
+                var html_bf817897147da2c22223068d7d490865 = $(`<div id="html_bf817897147da2c22223068d7d490865" style="width: 100.0%; height: 100.0%;">infantry-2a3e<br>a-h-G-U-C-I<br>48.55 39.8 infantry squad</div>`)[0];
+                popup_0ac322fe9d7a5e56055f1bb1a9c77c90.setContent(html_bf817897147da2c22223068d7d490865);
+            
+        
+
+        marker_780f81c04a90a6cd129de75c360f2d5c.bindPopup(popup_0ac322fe9d7a5e56055f1bb1a9c77c90)
+        ;
+
+        
+    
+    
+            marker_780f81c04a90a6cd129de75c360f2d5c.bindTooltip(
+                `<div>
+                     infantry-2a3e
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+</script>
+</html>
