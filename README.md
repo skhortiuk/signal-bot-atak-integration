@@ -248,14 +248,13 @@ Two routes, both documented so you can pick what your network allows:
 
 ### Live demo (real device)
 
-The map above is the local listener — a faithful stand-in for ATAK. For a
-screenshot of the real chain (a Signal Note-to-Self message and its marker on an
-actual iTAK map), follow [`docs/demo/CAPTURE.md`](docs/demo/CAPTURE.md). It walks
-through the two shots and, importantly, how to redact your phone number before
-committing to a public repo:
-
-- `docs/demo/signal_chat.jpg` — the Signal chat: the sent target and the `✅` reply.
-- `docs/demo/itak_marker.jpg` — the marker on the iTAK map.
+The chain has been run end-to-end on real hardware: a Signal **Note-to-Self**
+message on a linked signal-cli device → this bot → a marker on **iTAK** (iOS),
+with the `✅` reply coming back in the chat. That run is captured as a short
+**screen-recording provided with the submission** (kept out of this public repo
+because it shows a real phone number). The in-repo visual proof is the local
+listener map above, which renders the identical CoT the TAK client receives.
+[`docs/demo/CAPTURE.md`](docs/demo/CAPTURE.md) documents how to reproduce the run.
 
 ## Key decisions & assumptions
 
