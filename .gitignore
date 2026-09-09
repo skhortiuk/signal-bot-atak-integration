@@ -18,3 +18,6 @@ cot_map.html
 # ...but keep the committed demo artifacts
 !docs/demo/cot_map.html
 !docs/demo/listener.log
+
+# playwright-mcp scratch output
+.playwright-mcp/

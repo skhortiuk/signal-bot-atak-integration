@@ -1,8 +1,12 @@
-2026-09-01 09:49:53,854 INFO listener ready — Ctrl-C to stop
-2026-09-01 09:49:53,854 INFO TCP listening on 127.0.0.1:4245
-2026-09-01 09:49:54,046 INFO CoT from tcp 127.0.0.1:58555 | type=a-h-G-E-V-A-T lat=48.567123 lon=39.87897 callsign=tank-cee3
-2026-09-01 09:49:54,047 INFO CoT from tcp 127.0.0.1:58556 | type=a-h-G-E-V-A-A lat=48.6 lon=39.9 callsign=enemy-3440
-2026-09-01 09:49:54,047 INFO CoT from tcp 127.0.0.1:58557 | type=a-h-G-U-C-I lat=48.55 lon=39.8 callsign=infantry-2a3e
-2026-09-01 09:49:54,314 INFO map updated → docs/demo/cot_map.html (1 marker(s))
-2026-09-01 09:49:54,320 INFO map updated → docs/demo/cot_map.html (2 marker(s))
-2026-09-01 09:49:54,325 INFO map updated → docs/demo/cot_map.html (3 marker(s))
+2026-09-09 15:36:16,827 INFO listener ready — Ctrl-C to stop
+2026-09-09 15:36:16,827 INFO TCP listening on 127.0.0.1:4246
+2026-09-09 15:36:17,012 INFO CoT from tcp 127.0.0.1:52596 | type=a-h-G-E-V-A-T lat=48.567123 lon=39.87897 callsign=tank-bd8e
+2026-09-09 15:36:17,013 INFO CoT from tcp 127.0.0.1:52597 | type=a-h-G-E-V-A-A lat=48.62 lon=39.55 callsign=enemy-16bc
+2026-09-09 15:36:17,013 INFO CoT from tcp 127.0.0.1:52598 | type=a-h-G-U-C-I lat=48.41 lon=39.3 callsign=infantry-d65c
+2026-09-09 15:36:17,013 INFO CoT from tcp 127.0.0.1:52599 | type=a-h-G-E-V-U lat=48.75 lon=38.95 callsign=supply-786a
+2026-09-09 15:36:17,013 INFO CoT from tcp 127.0.0.1:52600 | type=a-h-G-U-C-F lat=48.3 lon=39.95 callsign=artillery-3994
+2026-09-09 15:36:17,581 INFO map updated → docs/demo/cot_map.html (1 marker(s))
+2026-09-09 15:36:17,586 INFO map updated → docs/demo/cot_map.html (2 marker(s))
+2026-09-09 15:36:17,593 INFO map updated → docs/demo/cot_map.html (3 marker(s))
+2026-09-09 15:36:17,599 INFO map updated → docs/demo/cot_map.html (4 marker(s))
+2026-09-09 15:36:17,606 INFO map updated → docs/demo/cot_map.html (5 marker(s))

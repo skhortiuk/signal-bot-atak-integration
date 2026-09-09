@@ -12,9 +12,9 @@ primary phone tells its linked devices *what it just sent* — a **sync transcri
 `envelope.dataMessage.message` sees nothing and appears dead, even though
 signal-cli is receiving fine.
 
-**The fix.** `signal_client.normalize_envelope` extracts the body from **both**
-shapes and yields a single `InboundMessage(source, destination, text, timestamp,
-is_sync)`:
+**The fix.** `messaging/signal.py`'s `normalize_envelope` extracts the body from
+**both** shapes and yields a single `InboundMessage(source, destination, text,
+timestamp, is_sync)`:
 
 - direct message: `envelope.dataMessage.message`, sender from `envelope.source`;
 - sync transcript: `envelope.syncMessage.sentMessage.message`, recipient from
@@ -65,13 +65,14 @@ queue. For a bot that emits one event per human message, that is a lot of
 machinery — and mixing an always-on asyncio loop into an otherwise synchronous
 receive loop adds a failure surface with no upside here.
 
-**The fix.** A ~90-line `tak_sender.py` over stdlib `socket` covers every scheme
-the assignment needs — `log://stdout`, `tcp://`, `udp://` including multicast
-(with an explicit `IP_MULTICAST_TTL`). The public surface is a `build_sender(url)
-→ object with .send(bytes)` factory, so the choice is swappable: dropping in a
-pytak-backed sender later touches nothing in `bot.py`. The trade-off: we don't
-get pytak's TLS/TAK-Server transports for free — acceptable, since the demo
-targets iTAK/WinTAK inputs and the local listener, not a TAK Server.
+**The fix.** A small `output/transport.py` over stdlib `socket` covers every
+scheme the assignment needs — `log://stdout`, `tcp://`, `udp://` including
+multicast (with an explicit `IP_MULTICAST_TTL`). The public surface is a
+`build_transport(url) → object with .send(bytes)` factory wrapped by `CotSink`,
+so the choice is swappable: dropping in a pytak-backed transport later touches
+nothing in `bot.py`. The trade-off: we don't get pytak's TLS/TAK-Server
+transports for free — acceptable, since the demo targets iTAK/WinTAK inputs and
+the local listener, not a TAK Server.
 
 ## 5. Multicast is unreliable on consumer Wi-Fi
 

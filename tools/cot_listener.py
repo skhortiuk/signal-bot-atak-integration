@@ -46,9 +46,21 @@ def _split_hostport(value: str) -> tuple[str, int]:
     return host, int(port)
 
 
+# CoT affiliation letter (type[2], e.g. a-h-G-…) → folium marker colour.
+_AFFIL_COLOR = {"h": "red", "f": "blue", "n": "green", "s": "orange", "u": "gray"}
+
+
+def _affiliation(cot_type: str) -> str:
+    """The affiliation letter of a CoT type string (``a-h-G-…`` → ``h``)."""
+    parts = cot_type.split("-")
+    return parts[1] if len(parts) > 1 else "u"
+
+
 class MapWriter:
     """Accumulates received events and rewrites an HTML map on each one.
 
+    Markers are coloured by CoT affiliation (hostile red, friendly blue, …)
+    and the view fits all points, so a whole scenario is visible at once.
     folium is imported lazily so the console-only path (``--no-map``) has
     no hard dependency on it.
     """
@@ -63,14 +75,21 @@ class MapWriter:
 
         with self._lock:
             self._events.append(event)
-            center = (self._events[-1].lat, self._events[-1].lon)
-            fmap = folium.Map(location=center, zoom_start=10)
+            points = [(ev.lat, ev.lon) for ev in self._events]
+            fmap = folium.Map(location=points[-1], zoom_start=11, tiles="OpenStreetMap")
             for ev in self._events:
+                color = _AFFIL_COLOR.get(_affiliation(ev.type), "gray")
                 folium.Marker(
                     location=(ev.lat, ev.lon),
-                    popup=f"{ev.callsign or ev.uid}<br>{ev.type}<br>{ev.remarks}",
+                    popup=folium.Popup(
+                        f"<b>{ev.callsign or ev.uid}</b><br>{ev.type}<br>{ev.remarks}",
+                        max_width=260,
+                    ),
                     tooltip=ev.callsign or ev.type,
+                    icon=folium.Icon(color=color, icon="crosshairs", prefix="fa"),
                 ).add_to(fmap)
+            if len(points) > 1:
+                fmap.fit_bounds(points, padding=(40, 40))
             fmap.save(str(self._path))
         logger.info("map updated → %s (%d marker(s))", self._path, len(self._events))
 

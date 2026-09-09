@@ -1,16 +1,84 @@
 # signal-atak — a Signal bot that drops targets onto ATAK
 
+![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)
+![Tests](https://img.shields.io/badge/tests-97%20passing-brightgreen.svg)
+![Code style](https://img.shields.io/badge/code%20style-black-000000.svg)
+![Lint](https://img.shields.io/badge/lint-ruff-d7ff64.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+
 Send a Signal message like `48.567123 39.87897 tank` and a marker appears on an
 ATAK / iTAK / WinTAK map. The bot parses the coordinates and description, builds
 a **Cursor-on-Target (CoT)** event, ships it to a TAK client, and replies in
 Signal with a confirmation.
 
+![Five targets rendered as CoT markers on the listener map](docs/demo/map_screenshot.jpg)
+
+<p align="center"><em>Five Signal messages → CoT events → markers on the bundled local
+listener (hostile = red). The listener is a full stand-in for the ATAK screen, so the
+whole chain runs on a laptop with no phone or Android in sight.</em></p>
+
+## Architecture
+
+```mermaid
+flowchart LR
+    phone["📱 Signal app<br/>(Note-to-Self)"]
+    daemon["signal-cli daemon<br/>HTTP JSON-RPC + SSE"]
+
+    subgraph bot["signal_atak bot"]
+      direction TB
+      recv["messaging/ · normalize<br/>dataMessage + syncMessage"]
+      parse["parser · text → Target"]
+      encode["output/cot · type + XML"]
+      emit["Sink.emit"]
+      recv --> parse --> encode --> emit
+    end
+
+    transport["transport<br/>udp · tcp · log"]
+    tak["🗺️ ATAK / iTAK / WinTAK<br/>— or the local cot_listener"]
+
+    phone -->|"message"| daemon -->|"SSE"| recv
+    emit --> transport --> tak
+    emit -.->|"✅ reply"| daemon -.-> phone
 ```
- Signal app ──▶ signal-cli daemon ──▶ signal_atak.bot ──▶ TAK sender ──▶ ATAK / iTAK / WinTAK
- (your phone)     (HTTP JSON-RPC)      parse → CoT XML      udp/tcp/log      (or the local
-                                            │                                  cot_listener)
-                                            └──▶ reply "✅ sent to ATAK…"
+
+The bot depends only on two seams — a **`Messenger`** (chat backend) and a
+**`Sink`** (target destination). Signal and CoT are just the implementations that
+ship; each lives behind a registry, so a new platform or output format is one
+module plus one registry line.
+
+## Examples
+
+Message format is two decimal numbers then a free-text description
+(`<lat> <lon> <description>`, commas optional). The description maps to a CoT
+type by keyword; these five were run end-to-end to produce the map above:
+
+| Message (Signal) | CoT type | Marker |
+|------------------|----------|--------|
+| `48.567123 39.878970 tank` | `a-h-G-E-V-A-T` | hostile tank |
+| `48.62 39.55 enemy APC near bridge` | `a-h-G-E-V-A-A` | hostile APC |
+| `48.41 39.30 infantry squad` | `a-h-G-U-C-I` | hostile infantry |
+| `48.75 38.95 supply truck` | `a-h-G-E-V-U` | hostile utility vehicle |
+| `48.30 39.95 artillery battery` | `a-h-G-U-C-F` | hostile artillery |
+
+Each message produces one CoT `<event>` and a Signal reply
+(`✅ sent tank @ 48.567123, 39.87897 → …`). The exact XML for the first message:
+
+```xml
+<?xml version="1.0" ?>
+<event version="2.0" uid="signal-demo-0001" type="a-h-G-E-V-A-T" how="m-g"
+       time="2026-09-09T12:00:00.000Z" start="2026-09-09T12:00:00.000Z"
+       stale="2026-09-09T12:10:00.000Z">
+  <point lat="48.567123" lon="39.87897" hae="9999999.0" ce="9999999.0" le="9999999.0"/>
+  <detail>
+    <contact callsign="tank-0001"/>
+    <remarks>48.567123 39.87897 tank</remarks>
+  </detail>
+</event>
 ```
+
+See [`docs/demo/`](docs/demo/) for these artifacts and
+[`docs/cot_protocol.md`](docs/cot_protocol.md) for the full type table and a field
+-by-field CoT walkthrough.
 
 ## Approach
 
@@ -18,22 +86,17 @@ The pipeline is four small, independently testable steps:
 
 1. **Parse** `text → Target(lat, lon, description)` with range validation and
    swapped-order detection (`parser.py`).
-2. **Classify** the description into a CoT type code (`cot_types.py`), using the
-   MITRE type catalog that ships with ATAK.
-3. **Build** a spec-compliant CoT `<event>` XML document (`cot.py`).
+2. **Classify** the description into a CoT type code (`output/cot/types.py`),
+   using the MITRE type catalog that ships with ATAK.
+3. **Build** a spec-compliant CoT `<event>` XML document (`output/cot/encode.py`).
 4. **Deliver** it to a `COT_URL` — multicast, TCP, UDP, or stdout
-   (`tak_sender.py`) — and **reply** in Signal (`signal_client.py`, `bot.py`).
+   (`output/transport.py` via `CotSink`) — and **reply** on the chat platform
+   (`messaging/signal.py`, `bot.py`).
 
 The two genuinely tricky parts are isolated as pure functions with heavy tests:
 the Signal receive-path normaliser (the Note-to-Self quirk, below) and the CoT
 builder. Everything that touches the network sits behind an interface so the
 logic is tested without a phone, a TAK client, or a running daemon.
-
-**The bot is platform- and output-agnostic.** It depends only on two protocols:
-a `Messenger` (a chat backend) and a `Sink` (a target destination). Signal and
-CoT are just the implementations that ship — each lives behind a small registry,
-so adding a chat platform (Telegram, …) or an output format is one new module
-plus one registry entry, with no change to `bot.py`.
 
 Tools used: Python 3.11+, `attrs`/`cattrs` (typed immutable models),
 `defusedxml` (safe XML parsing), `folium` (the test map), `pytest`/`ruff`/
@@ -87,10 +150,13 @@ pip install -r requirements.txt        # runtime deps
 pip install -e ".[dev]"                # + pytest/ruff/black for development
 ```
 
+Or with the Makefile: `make venv && make install`. `make help` lists every
+shortcut (`test`, `lint`, `format`, `check`, `listener`, `run`).
+
 Run the tests — this passes with **no** phone, daemon, or TAK client:
 
 ```bash
-pytest            # 89 tests, all offline
+pytest            # 97 tests, all offline    (or: make test)
 ```
 
 ### 2. Link signal-cli to your Signal account
