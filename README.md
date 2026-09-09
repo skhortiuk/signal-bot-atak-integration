@@ -231,6 +231,17 @@ Two routes, both documented so you can pick what your network allows:
   (**Settings → Network → Inputs/Outputs**) or WinTAK for TCP on a port, then set
   `COT_URL=tcp://<device_ip>:<port>`. This crosses routers that block multicast.
 
+### Live demo (real device)
+
+The map above is the local listener — a faithful stand-in for ATAK. For a
+screenshot of the real chain (a Signal Note-to-Self message and its marker on an
+actual iTAK map), follow [`docs/demo/CAPTURE.md`](docs/demo/CAPTURE.md). It walks
+through the two shots and, importantly, how to redact your phone number before
+committing to a public repo:
+
+- `docs/demo/signal_chat.jpg` — the Signal chat: the sent target and the `✅` reply.
+- `docs/demo/itak_marker.jpg` — the marker on the iTAK map.
+
 ## Key decisions & assumptions
 
 - **Coordinate order is `lat lon` by default.** The assignment example labels
