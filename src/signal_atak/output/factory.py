@@ -8,6 +8,7 @@ output-agnostic.
 from __future__ import annotations
 
 from collections.abc import Callable
+from pathlib import Path
 
 from ..config import Config
 from .base import Sink
@@ -20,6 +21,7 @@ def _build_cot_sink(cfg: Config) -> Sink:
         build_transport(cfg.cot_url),
         affiliation=cfg.affiliation,
         stale_minutes=cfg.stale_minutes,
+        state_path=Path(cfg.state_file) if cfg.state_file else None,
     )
 
 

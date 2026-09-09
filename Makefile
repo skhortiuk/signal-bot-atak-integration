@@ -34,5 +34,8 @@ listener:  ## Run the local CoT listener (TCP :4242 + folium map)
 run:  ## Run the bot (reads .env)
 	$(PY) -m signal_atak
 
+clear:  ## Retract every marker the bot has sent (clear TAK + local map)
+	$(PY) tools/clear_map.py $(if $(COT_URL),--cot-url $(COT_URL),)
+
 clean:  ## Remove caches and local artifacts
 	rm -rf .pytest_cache .ruff_cache **/__pycache__ src/*.egg-info cot_map.html

@@ -126,6 +126,7 @@ src/signal_atak/
       types.py         description → CoT type code (MITRE catalog)
       encode.py        Target → CoT XML; also parse_cot for the listener
 tools/cot_listener.py  local CoT listener + folium map (a fake TAK client)
+tools/clear_map.py     retract emitted markers (CoT delete) to clear the map
 tests/                 pytest suite (parser, cot, types, config, transport,
                        cot_sink, signal, bot)
 docs/                  cot_protocol.md, challenges.md
@@ -218,6 +219,20 @@ in the chat.
 
 Prefer to eyeball the raw protocol? `COT_URL=log://stdout python -m signal_atak`
 prints the CoT XML for each message.
+
+### Clearing the map
+
+The bot records every marker it emits, so you can wipe them all — from the TAK
+client *and* the local listener — before a fresh demo or recording:
+
+```bash
+python tools/clear_map.py                          # to the default multicast group
+python tools/clear_map.py --cot-url tcp://<ip>:4242  # to an iTAK TCP input
+# make clear     # same thing (pass COT_URL=… to override the target)
+```
+
+It sends a CoT **delete** (`t-x-d-d`) for each emitted marker's uid — the
+standard TAK retraction — then resets the tracking file.
 
 ### Delivering to a real iTAK / WinTAK
 

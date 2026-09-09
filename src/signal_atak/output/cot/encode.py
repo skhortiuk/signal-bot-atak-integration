@@ -47,7 +47,12 @@ UNKNOWN = "9999999.0"
 
 @frozen
 class CotEvent:
-    """A CoT event decoded from XML — the listener's typed view of a marker."""
+    """A CoT event decoded from XML — the listener's typed view of a marker.
+
+    A *delete* event (``type`` ``t-x-d-d``) is a retraction: ``is_delete``
+    is ``True`` and ``link_uid`` names the marker to remove, rather than a
+    new marker to add.
+    """
 
     uid: str
     type: str
@@ -56,6 +61,12 @@ class CotEvent:
     callsign: str = ""
     remarks: str = ""
     stale: str = ""
+    is_delete: bool = False
+    link_uid: str = ""
+
+
+#: CoT type of a "delete" task — tells a TAK client to remove a map item.
+DELETE_TYPE = "t-x-d-d"
 
 
 class CotParseError(ValueError):
@@ -142,6 +153,46 @@ def _callsign(description: str, uid: str) -> str:
     return f"{word}-{uid[-4:]}"
 
 
+def build_delete_cot(
+    target_uid: str,
+    *,
+    now: datetime | None = None,
+    uid: str | None = None,
+) -> bytes:
+    """Build a CoT *delete* event that retracts the marker ``target_uid``.
+
+    This is the standard TAK mechanism for removing a map item: a
+    ``t-x-d-d`` task event whose ``<detail><link>`` names the target uid.
+    TAK clients (ATAK/iTAK/WinTAK) delete the referenced marker on receipt;
+    the bundled listener honours it too.
+
+    :param target_uid: uid of the marker to remove.
+    :param now: time override for deterministic tests.
+    :param uid: this event's own uid override for tests.
+    """
+    if now is None:
+        now = datetime.now(UTC)
+    if uid is None:
+        uid = f"signal-del-{uuid.uuid4()}"
+
+    event = ET.Element(
+        "event",
+        version="2.0",
+        uid=uid,
+        type=DELETE_TYPE,
+        how="m-g",
+        time=_cot_time(now),
+        start=_cot_time(now),
+        stale=_cot_time(now + timedelta(minutes=1)),
+    )
+    # a point is schema-required even for a delete; 0/0 with unknown accuracy
+    ET.SubElement(event, "point", lat="0", lon="0", hae=UNKNOWN, ce=UNKNOWN, le=UNKNOWN)
+    detail = ET.SubElement(event, "detail")
+    ET.SubElement(detail, "link", uid=target_uid, relation="none", type="none")
+    ET.SubElement(detail, "__forcedelete")
+    return ET.tostring(event, encoding="utf-8", xml_declaration=True)
+
+
 def parse_cot(cot_xml: bytes | str) -> CotEvent:
     """Decode a CoT ``<event>`` document into a :class:`CotEvent`.
 
@@ -156,24 +207,30 @@ def parse_cot(cot_xml: bytes | str) -> CotEvent:
 
     if event.tag != "event":
         raise CotParseError(f"Root element is <{event.tag}>, expected <event>")
+
+    cot_type_str = event.attrib.get("type", "")
+    is_delete = cot_type_str.startswith(DELETE_TYPE)
+
     point = event.find("point")
     if point is None:
         raise CotParseError("CoT event has no <point>")
-
     try:
         lat = float(point.attrib["lat"])
         lon = float(point.attrib["lon"])
     except (KeyError, ValueError) as exc:
         raise CotParseError(f"CoT <point> missing usable lat/lon: {exc}") from exc
 
+    link = event.find("./detail/link")
     contact = event.find("./detail/contact")
     remarks = event.find("./detail/remarks")
     return CotEvent(
         uid=event.attrib.get("uid", ""),
-        type=event.attrib.get("type", ""),
+        type=cot_type_str,
         lat=lat,
         lon=lon,
         callsign=contact.attrib.get("callsign", "") if contact is not None else "",
         remarks=(remarks.text or "") if remarks is not None else "",
         stale=event.attrib.get("stale", ""),
+        is_delete=is_delete,
+        link_uid=link.attrib.get("uid", "") if link is not None else "",
     )

@@ -71,10 +71,38 @@ class MapWriter:
         self._lock = threading.Lock()
 
     def add(self, event: CotEvent) -> None:
+        """Add (or replace by uid) a marker and rewrite the map."""
+        with self._lock:
+            self._events = [e for e in self._events if e.uid != event.uid]
+            self._events.append(event)
+            self._render()
+        logger.info("map updated → %s (%d marker(s))", self._path, len(self._events))
+
+    def remove(self, target_uid: str) -> None:
+        """Remove the marker with ``target_uid`` (a CoT delete) and rewrite the map."""
+        with self._lock:
+            before = len(self._events)
+            self._events = [e for e in self._events if e.uid != target_uid]
+            self._render()
+        logger.info(
+            "retracted %s → %s (%d marker(s))",
+            target_uid,
+            "removed" if len(self._events) < before else "not found",
+            len(self._events),
+        )
+
+    def clear(self) -> None:
+        """Drop all markers and write an empty map."""
+        with self._lock:
+            self._events = []
+            self._render()
+        logger.info("map cleared → %s", self._path)
+
+    def _render(self) -> None:
+        """Rewrite the HTML map from the current events (holds the lock)."""
         import folium
 
-        with self._lock:
-            self._events.append(event)
+        if self._events:
             points = [(ev.lat, ev.lon) for ev in self._events]
             fmap = folium.Map(location=points[-1], zoom_start=11, tiles="OpenStreetMap")
             for ev in self._events:
@@ -90,16 +118,22 @@ class MapWriter:
                 ).add_to(fmap)
             if len(points) > 1:
                 fmap.fit_bounds(points, padding=(40, 40))
-            fmap.save(str(self._path))
-        logger.info("map updated → %s (%d marker(s))", self._path, len(self._events))
+        else:
+            fmap = folium.Map(location=(0, 0), zoom_start=2, tiles="OpenStreetMap")
+        fmap.save(str(self._path))
 
 
 def _handle(raw: bytes, source: str, mapwriter: MapWriter | None) -> None:
-    """Parse one CoT payload and report it."""
+    """Parse one CoT payload and report it (add a marker, or honour a delete)."""
     try:
         event = parse_cot(raw)
     except CotParseError as exc:
         logger.warning("dropped non-CoT payload from %s: %s", source, exc)
+        return
+    if event.is_delete:
+        logger.info("delete from %s | retract uid=%s", source, event.link_uid)
+        if mapwriter is not None:
+            mapwriter.remove(event.link_uid)
         return
     logger.info(
         "CoT from %s | type=%s lat=%s lon=%s callsign=%s",

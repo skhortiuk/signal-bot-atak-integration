@@ -45,6 +45,20 @@ phone and your iTAK device.
   once with `COT_URL=log://stdout` to capture the raw CoT XML.
 - Redact the number if it shows in a log line.
 
+## Clearing between takes
+
+If your map gets cluttered (e.g. duplicate markers from a mis-step), wipe it and
+start clean without restarting anything:
+
+```bash
+python tools/clear_map.py                            # multicast (default)
+python tools/clear_map.py --cot-url tcp://<ipad_ip>:4242   # if you used the TCP route
+```
+
+This retracts every marker the bot has sent (CoT `t-x-d-d` delete) from iTAK and
+the local listener, then resets the tracking file. Then re-send your messages for
+a clean set.
+
 ## Finishing
 
 - Save as JPEG, ~1200 px wide, into `docs/demo/` with the names above.

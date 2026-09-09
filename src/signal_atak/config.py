@@ -8,6 +8,7 @@ dependency for twelve lines of behaviour.
 from __future__ import annotations
 
 import os
+import tempfile
 from pathlib import Path
 
 from attrs import field, frozen, validators
@@ -15,6 +16,10 @@ from attrs import field, frozen, validators
 from .output.cot.types import VALID_AFFILIATIONS
 
 _TRUTHY = frozenset({"1", "true", "yes", "on"})
+
+#: default file the bot appends emitted marker uids to (shared with clear_map),
+#: so retraction works with zero configuration.
+DEFAULT_STATE_FILE = str(Path(tempfile.gettempdir()) / "signal_atak_emitted.txt")
 
 
 def _to_bool(value: str | bool) -> bool:
@@ -46,6 +51,8 @@ class Config:
     lon_first: bool = field(default=False, converter=_to_bool)
     stale_minutes: float = field(default=10.0, converter=float)
     affiliation: str = field(default="h", validator=validators.in_(VALID_AFFILIATIONS))
+    #: file emitted marker uids are appended to, for tools/clear_map.py to retract
+    state_file: str = DEFAULT_STATE_FILE
     log_level: str = "INFO"
 
     def sender_allowed(self, number: str | None) -> bool:
@@ -97,5 +104,6 @@ def load_config(env_file: Path | None = None) -> Config:
         lon_first=get("LON_FIRST", "false"),
         stale_minutes=get("STALE_MINUTES", "10"),
         affiliation=get("AFFILIATION", "h"),
+        state_file=get("STATE_FILE", DEFAULT_STATE_FILE),
         log_level=get("LOG_LEVEL", "INFO"),
     )

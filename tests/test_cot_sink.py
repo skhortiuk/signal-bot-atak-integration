@@ -67,3 +67,31 @@ def test_close_closes_transport():
     transport = RecordingTransport()
     CotSink(transport).close()
     assert transport.closed is True
+
+
+def test_emit_records_uid_to_state_file(tmp_path):
+    state = tmp_path / "emitted.txt"
+    sink = CotSink(RecordingTransport(), state_path=state)
+    sink.emit(Target(lat=1.0, lon=2.0, description="tank"))
+    sink.emit(Target(lat=3.0, lon=4.0, description="truck"))
+
+    uids = state.read_text().split()
+    assert len(uids) == 2
+    assert all(u.startswith("signal-") for u in uids)
+    assert uids[0] != uids[1]
+
+
+def test_recorded_uid_matches_emitted_marker_uid(tmp_path):
+    """The uid written to state must be the uid inside the emitted CoT."""
+    state = tmp_path / "emitted.txt"
+    transport = RecordingTransport()
+    CotSink(transport, state_path=state).emit(Target(lat=1.0, lon=2.0, description="tank"))
+
+    emitted_uid = ET.fromstring(transport.payloads[0]).attrib["uid"]
+    assert state.read_text().strip() == emitted_uid
+
+
+def test_no_state_path_means_no_file(tmp_path):
+    # default: state_path is None → nothing written, no crash
+    CotSink(RecordingTransport()).emit(Target(lat=1.0, lon=2.0, description="tank"))
+    assert list(tmp_path.iterdir()) == []
